@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFC Reader</title>
+<!-- <link rel="stylesheet" href="styles.css"> -->
+<style>
+    body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  #app {
+    text-align: center;
+  }
+  
+  #output {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+  }
+  
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>NFC Reader</h1>
+  <button id="read">Tap to Read NFC Tag</button>
+  <div id="output"></div>
+</div>
+<script>
+    const readButton = document.getElementById('read');
+const output = document.getElementById('output');
+
+readButton.addEventListener('click', async () => {
+  if ('NDEFReader' in window) {
+    try {
+      const reader = new NDEFReader();
+      await reader.scan();
+      output.textContent = 'Ready to read...';
+
+      reader.onreading = event => {
+        const message = event.message;
+        for (const record of message.records) {
+          console.log(`Record type: ${record.recordType}`);
+          console.log(`MIME type: ${record.mediaType}`);
+          console.log(`Record id: ${record.id}`);
+
+          const textDecoder = new TextDecoder();
+          output.textContent = `Data: ${textDecoder.decode(record.data)}`;
+        }
+      };
+    } catch (error) {
+      console.error(`Error: ${error.message}`);
+      output.textContent = `Error: ${error.message}`;
+    }
+  } else {
+    output.textContent = 'Web NFC is not supported.';
+  }
+});
+
+</script>
+<!-- <script src="script.js"></script> -->
+</body>
+</html>
